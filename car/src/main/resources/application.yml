@@ -1,6 +1,9 @@
 #server:
 #  port: 8088
 spring:
+# disabling web server to allow starting multiple instances on the same host
+  main:
+    web-application-type: none
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
   kafka:
