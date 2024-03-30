@@ -4,6 +4,6 @@ import se.callista.blog.synch_kafka.car.model.Car;
 
 public interface CarRepository {
 
-  Car getCar(String vin);
-
+  Car getCar(final String vin);
+  void setCar(final String vin, final Car car);
 }

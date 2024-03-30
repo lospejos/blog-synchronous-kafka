@@ -1,5 +1,6 @@
 package se.callista.blog.synch_kafka.car.client.conf;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +53,6 @@ public class KafkaConfig {
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
     props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-
     return props;
   }
 
@@ -72,7 +72,7 @@ public class KafkaConfig {
         new CompletableFutureReplyingKafkaTemplate<>(requestProducerFactory(),
             replyListenerContainer());
     requestReplyKafkaTemplate.setDefaultTopic(requestTopic);
-    requestReplyKafkaTemplate.setReplyTimeout(replyTimeout);
+    requestReplyKafkaTemplate.setDefaultReplyTimeout(Duration.ofMillis(replyTimeout));
     return requestReplyKafkaTemplate;
   }
 

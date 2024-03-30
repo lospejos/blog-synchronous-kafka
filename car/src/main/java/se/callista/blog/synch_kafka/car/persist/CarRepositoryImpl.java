@@ -2,7 +2,7 @@ package se.callista.blog.synch_kafka.car.persist;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 import se.callista.blog.synch_kafka.car.model.Car;
 
@@ -18,8 +18,13 @@ public class CarRepositoryImpl implements CarRepository {
   }
 
   @Override
-  public Car getCar(String vin) {
+  public Car getCar(final String vin) {
     return cars.get(vin);
+  }
+
+  @Override
+  public void setCar(final String vin, final Car car) {
+    this.cars.put(vin, car);
   }
 
 }

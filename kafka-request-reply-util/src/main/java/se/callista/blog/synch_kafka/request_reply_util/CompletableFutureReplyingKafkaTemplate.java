@@ -61,7 +61,7 @@ public class CompletableFutureReplyingKafkaTemplate<K, V, R> extends PartitionAw
   }
 
   private CompletableFuture<R> adapt(RequestReplyFuture<K, V, R> requestReplyFuture) {
-    CompletableFuture<R> completableResult = new CompletableFuture<R>() {
+    CompletableFuture<R> completableResult = new CompletableFuture<>() {
       @Override
       public boolean cancel(boolean mayInterruptIfRunning) {
         boolean result = requestReplyFuture.cancel(mayInterruptIfRunning);
@@ -70,27 +70,24 @@ public class CompletableFutureReplyingKafkaTemplate<K, V, R> extends PartitionAw
       }
     };
     // Add callback to the request sending result
-    requestReplyFuture.getSendFuture().addCallback(new ListenableFutureCallback<SendResult<K, V>>() {
-      @Override
-      public void onSuccess(SendResult<K, V> sendResult) {
-        // NOOP
-      }
-      @Override
-      public void onFailure(Throwable t) {
-        completableResult.completeExceptionally(t);
-      }
+    requestReplyFuture.getSendFuture().whenComplete(
+      (res, error) -> {
+        if (error != null) { // error case
+          completableResult.completeExceptionally(error);
+        }
     });
+
     // Add callback to the reply
-    requestReplyFuture.addCallback(new ListenableFutureCallback<ConsumerRecord<K, R>>() {
-      @Override
-      public void onSuccess(ConsumerRecord<K, R> result) {
-        completableResult.complete(result.value());
-      }
-      @Override
-      public void onFailure(Throwable t) {
-        completableResult.completeExceptionally(t);
+    requestReplyFuture.whenComplete(
+      (res, error) -> {
+        if (error != null) { // error case
+          completableResult.completeExceptionally(error);
+        }
+      else if (res != null) { // success case
+          completableResult.complete(res.value());
       }
     });
+
     return completableResult;
   }
 
